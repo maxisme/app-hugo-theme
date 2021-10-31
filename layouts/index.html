@@ -1,0 +1,143 @@
+{{ define "main" }}
+
+{{ $pages := "layouts/partials/" }}
+
+<head>
+    <!-- Info META -->
+    <title>{{.Title}}</title>
+    <meta name="keywords" content="{{.Keywords}}">
+    <meta name="description" content="{{.Description}}">
+    <link rel="shortcut icon" href="/images/icon.ico">
+    <meta property="og:title" content="{{.Title}}"/>
+    <meta property="og:description" content="{{.Description}}"/>
+    <meta property="og:image" content="/images/og_logo.png"/>
+
+    <!-- Mobile Meta -->
+    <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=0"/>
+
+    <!-- jQuery -->
+    <script src="/js/jquery.min.js"></script>
+
+    <!-- Materialize -->
+    <script src="/js/materialize.min.js"></script>
+    <link rel="stylesheet" href="/css/materialize/materialize.css">
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css?family=Montserrat:200,300,400,500,600,700" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet">
+
+    <!-- Font Awesome -->
+    <script src="/js/all.js"></script>
+
+    <!-- Custom CSS -->
+    <link rel="stylesheet" type="text/css" href="/css/style.min.css"/>
+
+    <!-- Custom JS -->
+    <script src="/js/script.js"></script>
+</head>
+<body>
+<page id="welcome" class="welcome">
+    <div class="valign-wrapper">
+        <div align="center" class="valign">
+            <p>
+                <img class="logo" src="/images/logo.png">
+            </p>
+            <h1>{{.Title}}</h1>
+            <div class="info">{{.Description}}</div>
+            <a href="download" id="download" class="download" style="display: none">
+                DOWNLOAD
+                <i class="fab fa-apple"></i>
+            </a>
+            <p class="nav">
+                {{ range (readDir $pages) }}
+                    {{ $name := replace .Name ".html" "" }}
+                    <a href="#{{ $name }}">
+                        {{ $name := replace $name "-" " " }}
+                        {{ $name }}
+                    </a>
+                {{end}}
+                <a href="#terms">Terms</a>
+                <a href="#contact">Contact</a>
+            </p>
+        </div>
+    </div>
+</page>
+
+{{ range (readDir $pages) }}
+    {{ $name := replace .Name ".html" "" }}
+    <page id='{{ $name }}'>
+        {{ $name := replace $name "-" " " }}
+        <div align='center'><h2>{{ $name }}</h2></div>
+        {{ partial (printf "partials/%s" .Name ) . }}
+    </page>
+{{ end }}
+
+<!-- terms -->
+<page id='terms'>
+    <div align='center'><h2>Ts & Cs</h2></div>
+    By using the {{.Title}} application you are agreeing to these terms:<br/><br/> Use of the Service is at your
+    own
+    risk. The Service is provided on an "AS IS" and "AS AVAILABLE" basis without any representation or endorsement
+    made and without warranty of any kind whether expressed or implied, including but not limited to the implied
+    warranties of satisfactory quality, fitness for a particular purpose, non-infringement, compatibility, security
+    and accuracy.<br/><br/>To the extent permitted by law, the Service, will not be liable for any indirect or
+    consequential loss or damage whatsoever (including without limitation, loss of business, opportunity, data,
+    profits) arising out of or in connection with the use of the Service.
+</page>
+
+<!-- contact -->
+<page id="contact">
+    <div align='center'><h2>Contact</h2></div>
+    <p>
+        Please feel free to drop us an email. We would absolutely ❤️ to hear from you.
+    </p>
+
+    <!-- form -->
+    <form method="post" action="/email">
+        <div class="row">
+            <div class="col s12 m12 l6 input-field">
+                <input id="name" name="name" type="text">
+                <label for="name">Name</label>
+            </div>
+
+            <div class="col s12 m12 l6 input-field">
+                <input id="email" name="from" type="text">
+                <!-- not type="email" as that makes submission fail -->
+                <label for="email">Email</label>
+            </div>
+        </div>
+
+        <div class="row">
+            <div class="col s12 input-field">
+                <textarea id="mess" name="body" class="materialize-textarea"></textarea>
+                <label for="mess">Message</label>
+            </div>
+        </div>
+        <input type="hidden" id="g-resp" name="g-recaptcha-response">
+        <div align="center" id="captcha"></div>
+        <!-- hidden submit button -->
+        <input id="submit" type="submit" style="visibility: hidden" disabled="disabled">
+    </form>
+    <div align="center" class="sub">Designed, maintained and built by <a href="https://max.me.uk">Maximilian
+        Mitchell</a><br>© {{ .Date.Format "2006" }}
+    </div>
+
+    <!-- recaptcha import -->
+    <script>
+        var correctCaptcha = function (response) {
+            $("#g-resp").val(response);
+            $("#submit").removeAttr("disabled");
+            $("#submit").click();
+        };
+
+        var onloadCallback = function () {
+            grecaptcha.render('captcha', {
+                'sitekey': "{# .Project.Recaptcha.Pub #}",
+                'callback': correctCaptcha
+            });
+        };
+    </script>
+    <script src="https://www.google.com/recaptcha/api.js?onload=onloadCallback&render=explicit" async defer></script>
+</page>
+</body>
+{{ end }}
