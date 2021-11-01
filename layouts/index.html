@@ -68,7 +68,7 @@
     <page id='{{ $name }}'>
         {{ $name := replace $name "-" " " }}
         <div align='center'><h2>{{ $name }}</h2></div>
-        {{ partial (printf "partials/%s" .Name ) . }}
+        {{ partial .Name . }}
     </page>
 {{ end }}
 
